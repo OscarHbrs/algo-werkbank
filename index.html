@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Algo Werkbank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand" aria-label="Algo">
+      <span class="rail" aria-hidden="true"></span>
+      <span class="terminal">Algo</span>
+      <span class="rail arrow" aria-hidden="true"></span>
+      <span class="brand-sub">Werkbank für die Sprache aus Programmierung 1</span>
+    </div>
+    <div class="toolbar">
+      <label class="sr-only" for="example">Beispiel laden</label>
+      <select id="example"></select>
+      <span class="sep" aria-hidden="true"></span>
+      <button id="run" class="btn primary" title="Ausführen (Strg+Enter)">▶ Ausführen</button>
+      <button id="step" class="btn" title="Einzelschritt (F10)">⤼ Schritt</button>
+      <button id="stop" class="btn" title="Anhalten (Esc)" disabled>■ Stopp</button>
+    </div>
+  </header>
+
+  <main class="work">
+    <section class="pane editor-pane" aria-label="Programm">
+      <div class="pane-head">
+        <span class="label">Programm</span>
+        <div class="insert">
+          <button class="chip" data-insert="≠" title="Ungleich-Zeichen einfügen (oder != tippen)">≠</button>
+          <button class="chip" data-insert="  " title="Zwei Leerzeichen (Tab)">␣␣</button>
+        </div>
+      </div>
+      <div class="editor" id="editor">
+        <pre class="gutter" id="gutter" aria-hidden="true"></pre>
+        <div class="code">
+          <pre class="hl" id="hl" aria-hidden="true"></pre>
+          <textarea id="src" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="Algo-Quelltext"></textarea>
+        </div>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="pane side" aria-label="Werkzeuge">
+      <nav class="tabs" role="tablist">
+        <button role="tab" id="tab-run" aria-controls="view-run" aria-selected="true">Ausführung</button>
+        <button role="tab" id="tab-ns" aria-controls="view-ns" aria-selected="false">Struktogramm</button>
+        <button role="tab" id="tab-deriv" aria-controls="view-deriv" aria-selected="false">Ableitung</button>
+        <button role="tab" id="tab-tree" aria-controls="view-tree" aria-selected="false">Syntaxbaum</button>
+        <button role="tab" id="tab-gram" aria-controls="view-gram" aria-selected="false">Grammatik</button>
+      </nav>
+
+      <div class="view" id="view-run" role="tabpanel" aria-labelledby="tab-run">
+        <div class="inputs">
+          <label for="inputs">Eingaben vorab <span class="hint">für LIES, durch Leerzeichen getrennt</span></label>
+          <input id="inputs" type="text" inputmode="numeric" placeholder="z. B. 18 12" autocomplete="off">
+        </div>
+        <div class="console" id="console" aria-live="polite"></div>
+        <form class="ask" id="ask" hidden>
+          <label for="ask-input" id="ask-label">a =</label>
+          <input id="ask-input" type="text" inputmode="numeric" autocomplete="off">
+          <button class="btn" type="submit">Eingeben</button>
+        </form>
+        <div class="vars-wrap">
+          <div class="label">Speicher</div>
+          <table class="vars" id="vars"><tbody></tbody></table>
+        </div>
+      </div>
+
+      <div class="view" id="view-ns" role="tabpanel" aria-labelledby="tab-ns" hidden>
+        <p class="lead">Nassi-Shneiderman-Diagramm des aktuellen Programms. Ein Klick auf einen Block markiert die Zeile im Programm.</p>
+        <div class="ns-scroll"><div id="ns"></div></div>
+      </div>
+
+      <div class="view" id="view-deriv" role="tabpanel" aria-labelledby="tab-deriv" hidden>
+        <p class="lead">Linksableitung vom Startsymbol &lt;Anweisung&gt; bis zum fertigen Programm, Schritt für Schritt wie auf den Folien.</p>
+        <div class="deriv-controls">
+          <button class="btn" id="d-first" title="Zum Anfang">⏮</button>
+          <button class="btn" id="d-prev" title="Zurück">◀</button>
+          <input type="range" id="d-range" min="0" value="0" aria-label="Ableitungsschritt">
+          <button class="btn" id="d-next" title="Weiter">▶</button>
+          <button class="btn" id="d-last" title="Zum Ende">⏭</button>
+          <span class="d-count" id="d-count"></span>
+        </div>
+        <div class="d-rule" id="d-rule"></div>
+        <pre class="d-form" id="d-form"></pre>
+      </div>
+
+      <div class="view" id="view-tree" role="tabpanel" aria-labelledby="tab-tree" hidden>
+        <p class="lead">Ableitungsbaum: Nichtterminale als Knoten, Terminalsymbole als Blätter. ␣ steht für ein Leerzeichen, ↵ für einen Zeilenumbruch.</p>
+        <div class="tree-scroll"><div id="tree"></div></div>
+      </div>
+
+      <div class="view" id="view-gram" role="tabpanel" aria-labelledby="tab-gram" hidden>
+        <p class="lead">Die Syntaxdiagramme der Vorlesung in EBNF. Startsymbol: &lt;Anweisung&gt;.</p>
+        <div class="gram-scroll"><table class="grammar" id="grammar"></table></div>
+        <ul class="rules">
+          <li>Jede Einzelanweisung steht in einer eigenen Zeile. Leerzeilen gibt es nicht.</li>
+          <li>Ein Programm beginnt ohne Einrückung. Jeder Rumpf steht genau zwei Leerzeichen tiefer.</li>
+          <li>Zwischen den Teilen einer Anweisung steht genau ein Leerzeichen, am Zeilenende keines.</li>
+          <li>Alle Werte sind Ganzzahlen. Division schneidet ab: 7 / 2 = 3, -7 / 2 = -3.</li>
+          <li>Variablen werden vor der Verwendung mit DEKLARIERE bekannt gemacht.</li>
+        </ul>
+        <p class="alphabet"><span class="label">Σalgo</span> a … z · A B D E F G I K L N O R S T U W Z · 0 … 9 · + - * / &lt; = &gt; ≠ , : ␣ ↵</p>
+      </div>
+    </section>
+  </main>
+</div>
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
