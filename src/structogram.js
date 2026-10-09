@@ -18,7 +18,7 @@ export const PALETTE = [
   { type: 'while', label: 'SOLANGE' },
 ];
 
-export function createStructogramEditor({ container, palette, buttons, scroller, onSource }) {
+export function createStructogramEditor({ container, palette, buttons, scroller, onSource, onSelect }) {
   let model = null;      // { kind: 'program', body }
   let sel = null;        // { type: 'stmt', path } | { type: 'slot', block, index } | { type: 'noelse', path }
   let history = [];
@@ -396,6 +396,7 @@ export function createStructogramEditor({ container, palette, buttons, scroller,
     else if (node) sel = { type: 'stmt', path: node.dataset.path };
     else sel = null;
     applySelection();
+    notifySelect();
     container.focus({ preventScroll: true });
   });
   container.addEventListener('dblclick', (e) => {
@@ -427,6 +428,11 @@ export function createStructogramEditor({ container, palette, buttons, scroller,
     const next = nodes[Math.max(0, Math.min(nodes.length - 1, i < 0 ? 0 : i + dir))];
     sel = { type: 'stmt', path: next.dataset.path };
     applySelection();
+    notifySelect();
+  }
+  // Nur bei Auswahl durch den Nutzer melden, nicht bei jedem Neuzeichnen
+  function notifySelect() {
+    if (sel?.type === 'stmt' && onSelect) onSelect(resolve(sel.path)?.stmt.line ?? null);
   }
 
   palette.innerHTML = PALETTE.map((p) => `<button class="chip" data-new="${p.type}" title="Ziehen oder klicken zum Einfügen">${esc(p.label)}</button>`).join('');

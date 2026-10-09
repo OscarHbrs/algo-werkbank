@@ -1,0 +1,14 @@
+{
+  "wordPattern": "[a-zA-Z]+|-?[0-9]+",
+  "indentationRules": {
+    "increaseIndentPattern": "^\\s*(WENN .*:|SOLANGE .*:|SONST:)\\s*$",
+    "decreaseIndentPattern": "^\\s*(ENDE WENN|ENDE SOLANGE|SONST:)\\s*$"
+  },
+  "onEnterRules": [
+    { "beforeText": "^\\s*(WENN .*|SOLANGE .*|SONST):\\s*$", "action": { "indent": "indent" } }
+  ],
+  "folding": {
+    "offSide": true,
+    "markers": { "start": "^\\s*(WENN|SOLANGE) ", "end": "^\\s*ENDE (WENN|SOLANGE)\\b" }
+  }
+}

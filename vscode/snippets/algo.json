@@ -1,0 +1,21 @@
+{
+  "Deklaration": { "prefix": ["dek", "DEKLARIERE"], "body": "DEKLARIERE ${1:x}", "description": "Variablen bekannt machen" },
+  "Zuweisung": { "prefix": ["setze", "SETZE"], "body": "SETZE ${1:x} AUF ${2:0}", "description": "Einen Wert speichern" },
+  "Eingabe": { "prefix": ["lies", "LIES"], "body": "LIES ${1:x} EIN", "description": "Eine Ganzzahl einlesen" },
+  "Ausgabe": { "prefix": ["gib", "GIB"], "body": "GIB ${1:x} AUS", "description": "Einen Wert ausgeben" },
+  "Selektion": {
+    "prefix": ["wenn", "WENN"],
+    "body": ["WENN ${1:x} ${2|>,<,=,≠,>=,<=|} ${3:0}:", "  $0", "ENDE WENN"],
+    "description": "Verzweigung ohne SONST"
+  },
+  "Selektion mit SONST": {
+    "prefix": ["wennsonst", "WENN SONST"],
+    "body": ["WENN ${1:x} ${2|>,<,=,≠,>=,<=|} ${3:0}:", "  $4", "SONST:", "  $0", "ENDE WENN"],
+    "description": "Verzweigung mit SONST"
+  },
+  "Iteration": {
+    "prefix": ["solange", "SOLANGE"],
+    "body": ["SOLANGE ${1:x} ${2|>,<,=,≠,>=,<=|} ${3:0}:", "  $0", "ENDE SOLANGE"],
+    "description": "Schleife"
+  }
+}

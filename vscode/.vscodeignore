@@ -1,0 +1,10 @@
+src/**
+webview/**
+test/**
+node_modules/**
+.vscode-test/**
+build.mjs
+*.vsix
+.gitignore
+dist/core.cjs
+dist/harness.html

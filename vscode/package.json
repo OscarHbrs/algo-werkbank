@@ -1,0 +1,107 @@
+{
+  "name": "algo-werkbank",
+  "displayName": "Algo",
+  "description": "Die Sprache Algo aus Programmierung 1 (HBRS): Syntaxprüfung, Ausführen, Debugger, Struktogramm-Editor, Ableitung und Syntaxbaum.",
+  "version": "0.1.0",
+  "publisher": "oscarhbrs",
+  "license": "UNLICENSED",
+  "repository": { "type": "git", "url": "https://github.com/OscarHbrs/algo-werkbank" },
+  "homepage": "https://oscarhbrs.github.io/algo-werkbank/",
+  "icon": "media/icon.png",
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["Programming Languages", "Debuggers", "Education"],
+  "main": "./dist/extension.js",
+  "activationEvents": ["onLanguage:algo", "onDebugResolve:algo", "onDebugDynamicConfigurations:algo"],
+  "contributes": {
+    "languages": [{
+      "id": "algo",
+      "aliases": ["Algo", "algo"],
+      "extensions": [".algo"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{ "language": "algo", "scopeName": "source.algo", "path": "./syntaxes/algo.tmLanguage.json" }],
+    "snippets": [{ "language": "algo", "path": "./snippets/algo.json" }],
+    "configurationDefaults": {
+      "[algo]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.detectIndentation": false,
+        "editor.renderWhitespace": "boundary",
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "files.trimFinalNewlines": true
+      }
+    },
+    "breakpoints": [{ "language": "algo" }],
+    "debuggers": [{
+      "type": "algo",
+      "label": "Algo",
+      "languages": ["algo"],
+      "configurationAttributes": {
+        "launch": {
+          "required": ["program"],
+          "properties": {
+            "program": { "type": "string", "description": "Algo-Datei, die ausgeführt wird.", "default": "${file}" },
+            "stopOnEntry": { "type": "boolean", "description": "Vor der ersten Anweisung anhalten (Schritt für Schritt).", "default": true },
+            "eingaben": { "type": "string", "description": "Eingaben für LIES, durch Leerzeichen getrennt, z. B. \"18 12\". Fehlende Eingaben werden abgefragt.", "default": "" }
+          }
+        }
+      },
+      "initialConfigurations": [
+        { "type": "algo", "request": "launch", "name": "Algo: aktuelle Datei", "program": "${file}", "stopOnEntry": true }
+      ],
+      "configurationSnippets": [{
+        "label": "Algo: Datei ausführen",
+        "description": "Algo-Programm im Debugger ausführen",
+        "body": { "type": "algo", "request": "launch", "name": "Algo: aktuelle Datei", "program": "^\"\\${file}\"", "stopOnEntry": true, "eingaben": "" }
+      }]
+    }],
+    "commands": [
+      { "command": "algo.run", "title": "Ausführen", "category": "Algo", "icon": "$(play)" },
+      { "command": "algo.stepThrough", "title": "Schritt für Schritt ausführen", "category": "Algo", "icon": "$(debug-step-over)" },
+      { "command": "algo.debug", "title": "Debuggen (bis zum Haltepunkt)", "category": "Algo", "icon": "$(debug-alt)" },
+      { "command": "algo.showStructogram", "title": "Struktogramm öffnen", "category": "Algo", "icon": "$(type-hierarchy-sub)" },
+      { "command": "algo.showDerivation", "title": "Ableitung anzeigen", "category": "Algo" },
+      { "command": "algo.showTree", "title": "Syntaxbaum anzeigen", "category": "Algo" },
+      { "command": "algo.showGrammar", "title": "Grammatik anzeigen", "category": "Algo" },
+      { "command": "algo.openExample", "title": "Beispiel öffnen", "category": "Algo" },
+      { "command": "algo.newFile", "title": "Neue Algo-Datei", "category": "Algo" }
+    ],
+    "menus": {
+      "editor/title": [
+        { "command": "algo.run", "when": "editorLangId == algo", "group": "navigation@1" },
+        { "command": "algo.stepThrough", "when": "editorLangId == algo && !inDebugMode", "group": "navigation@2" },
+        { "command": "algo.showStructogram", "when": "editorLangId == algo", "group": "navigation@3" }
+      ],
+      "editor/context": [
+        { "command": "algo.run", "when": "editorLangId == algo", "group": "algo@1" },
+        { "command": "algo.stepThrough", "when": "editorLangId == algo", "group": "algo@2" },
+        { "command": "algo.showStructogram", "when": "editorLangId == algo", "group": "algo@3" },
+        { "command": "algo.showDerivation", "when": "editorLangId == algo", "group": "algo@4" },
+        { "command": "algo.showTree", "when": "editorLangId == algo", "group": "algo@5" }
+      ],
+      "commandPalette": [
+        { "command": "algo.run", "when": "editorLangId == algo" },
+        { "command": "algo.stepThrough", "when": "editorLangId == algo" },
+        { "command": "algo.debug", "when": "editorLangId == algo" }
+      ]
+    },
+    "keybindings": [
+      { "command": "algo.run", "key": "ctrl+enter", "mac": "cmd+enter", "when": "editorTextFocus && editorLangId == algo" },
+      { "command": "algo.stepThrough", "key": "f10", "when": "editorTextFocus && editorLangId == algo && !inDebugMode" }
+    ]
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "test": "node build.mjs && node --test --test-timeout=10000 test/*.test.mjs",
+    "test:vscode": "node build.mjs && node test/run-vscode.mjs",
+    "package": "node build.mjs && vsce package --no-dependencies --skip-license -o algo.vsix"
+  },
+  "devDependencies": {
+    "@vscode/debugadapter": "1.68.0",
+    "@vscode/test-electron": "3.1.0",
+    "@vscode/vsce": "4.0.0",
+    "esbuild": "0.28.2"
+  }
+}

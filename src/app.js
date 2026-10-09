@@ -1,6 +1,5 @@
-import {
-  check, execute, parseInteger, derivationTree, derivationOrder, sententialForm, productionAt, GRAMMAR,
-} from './algo.js';
+import { check, execute, parseInteger, derivationTree, derivationOrder, productionAt } from './algo.js';
+import { sententialFormHTML, treeHTML, grammarHTML } from './views.js';
 import { EXAMPLES } from './examples.js';
 import { createStructogramEditor } from './structogram.js';
 
@@ -537,13 +536,7 @@ function showDerivStep() {
   dRange.value = k;
   $('#d-count').textContent = `${k} / ${deriv.order.length}`;
   $('#d-rule').textContent = k === 0 ? 'Startsymbol: <Anweisung>' : `Schritt ${k}:  ${productionAt(deriv.order, k)}`;
-  let html = '';
-  for (const p of sententialForm(deriv.tree, k)) {
-    const text = esc(p.text);
-    const inner = p.nt ? `<span class="nt">${text}</span>` : text;
-    html += p.fresh && !p.indent ? `<span class="fresh">${inner}</span>` : inner;
-  }
-  $('#d-form').innerHTML = html;
+  $('#d-form').innerHTML = sententialFormHTML(deriv.tree, k);
 }
 
 const setDeriv = (k) => { deriv.step = Math.max(0, Math.min(deriv.order.length, k)); showDerivStep(); };
@@ -557,19 +550,10 @@ $('#d-last').addEventListener('click', () => setDeriv(deriv.order.length));
 // Syntaxbaum
 // ---------------------------------------------------------------------------
 
-function treeHTML(n, depth) {
-  if (!n.nt) {
-    const t = n.t.replace(/ /g, '␣').replace(/\n/g, '↵');
-    return `<li><span class="leaf">${esc(t)}</span></li>`;
-  }
-  const open = depth < 12 ? ' open' : '';
-  return `<li><details${open}><summary>&lt;${n.nt}&gt;</summary><ul>${n.children.map((c) => treeHTML(c, depth + 1)).join('')}</ul></details></li>`;
-}
-
 function renderTree() {
   const el = $('#tree');
   if (!result.ok) { el.innerHTML = invalidNote(); return; }
-  el.innerHTML = `<ul>${treeHTML(derivationTree(result.program), 0)}</ul>`;
+  el.innerHTML = treeHTML(derivationTree(result.program));
 }
 
 // ---------------------------------------------------------------------------
@@ -577,13 +561,7 @@ function renderTree() {
 // ---------------------------------------------------------------------------
 
 function renderGrammar() {
-  const rhs = (s) => s.replace(/(<[A-Za-z]+>)|(\s+)|([{}[\]()|…])|(<|[^\s<]+)/g, (m, nt, ws, meta, term) => {
-    if (nt) return `<span class="kw">${esc(nt)}</span>`;
-    if (ws) return ' ';
-    if (meta) return `<span class="pun">${esc(meta)}</span>`;
-    return `<span class="t">${esc(term)}</span>`;
-  });
-  $('#grammar').innerHTML = GRAMMAR.map(([l, r]) => `<tr><td>&lt;${l}&gt;</td><td>:=</td><td>${rhs(r)}</td></tr>`).join('');
+  $('#grammar').innerHTML = grammarHTML();
 }
 
 // ---------------------------------------------------------------------------

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Algo",
+  "scopeName": "source.algo",
+  "patterns": [
+    { "name": "keyword.control.algo", "match": "\\b(WENN|SONST|SOLANGE|ENDE)\\b" },
+    { "name": "keyword.other.algo", "match": "\\b(DEKLARIERE|SETZE|AUF|LIES|EIN|GIB|AUS)\\b" },
+    { "name": "constant.numeric.integer.algo", "match": "(?<![a-z0-9])-?[0-9]+\\b" },
+    { "name": "keyword.operator.comparison.algo", "match": "<=|>=|≠|<|>|=" },
+    { "name": "keyword.operator.arithmetic.algo", "match": "[+\\-*/]" },
+    { "name": "variable.other.algo", "match": "\\b[a-z]+\\b" },
+    { "name": "punctuation.separator.algo", "match": "[,:]" },
+    { "name": "invalid.illegal.algo", "match": "[^a-zABDEFGIKLNORSTUWZ0-9+\\-*/<=>≠,: ]" }
+  ]
+}

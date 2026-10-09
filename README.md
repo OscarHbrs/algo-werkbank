@@ -44,6 +44,10 @@ GIB a AUS
 - Laufzeitfehler: Lesen einer Variable ohne Wert, Division durch 0.
 - Eingaben für `LIES` müssen Ganzzahlen nach L<sub>dez</sub> sein (z. B. `12`, `-3`, `0`).
 
+## VS Code
+
+Im Ordner [`vscode/`](vscode/) liegt eine Erweiterung, die alles davon auch in VS Code bietet: Hervorhebung, Fehler beim Tippen, Ausführen im Terminal, echter Debugger mit Haltepunkten, Struktogramm-Editor, Ableitung, Syntaxbaum und Grammatik. Installieren: `algo.vsix` aus den [Releases](https://github.com/OscarHbrs/algo-werkbank/releases) laden und in VS Code „Erweiterungen → … → Aus VSIX installieren“ wählen, oder `code --install-extension algo.vsix`.
+
 ## Starten
 
 Statische Seite ohne Build-Schritt. Wegen ES-Modulen über einen lokalen Server öffnen:
@@ -65,5 +69,7 @@ npm test
 - `src/algo.js` – Sprachkern: Alphabet- und Syntaxprüfung (rekursiver Abstieg inkl. Einrückung), Semantikprüfung, Interpreter als Generator, Ableitungsbaum
 - `src/app.js` – Oberfläche
 - `src/structogram.js` – Struktogramm-Editor
+- `src/views.js` – Darstellungen von Ableitung, Syntaxbaum, Grammatik (auch für VS Code)
+- `vscode/` – VS-Code-Erweiterung
 - `src/examples.js` – Beispielprogramme
 - `test/` – Tests mit `node:test`

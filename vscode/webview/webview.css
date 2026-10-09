@@ -1,0 +1,50 @@
+/* Webview im VS-Code-Theme: die Tokens der Werkbank auf die Theme-Farben von VS Code legen. */
+body {
+  --bg: var(--vscode-editor-background);
+  --surface: var(--vscode-editor-background);
+  --sunken: var(--vscode-sideBar-background, var(--vscode-editor-background));
+  --ink: var(--vscode-editor-foreground);
+  --muted: var(--vscode-descriptionForeground);
+  --line: var(--vscode-panel-border, var(--vscode-widget-border, #8884));
+  --accent: var(--vscode-textLink-foreground);
+  --accent-ink: var(--vscode-button-foreground);
+  --terminal: var(--vscode-editor-inactiveSelectionBackground);
+  --current: var(--vscode-editor-stackFrameHighlightBackground, #ffcc0040);
+  --current-edge: var(--vscode-debugIcon-pauseForeground, #e0a400);
+  --ok: var(--vscode-testing-iconPassed, #3fb950);
+  --err: var(--vscode-errorForeground);
+  --err-bg: var(--vscode-inputValidation-errorBackground, #f003);
+  --syn-kw: var(--vscode-symbolIcon-keywordForeground, var(--vscode-textLink-foreground));
+  --syn-num: var(--vscode-debugTokenExpression-number, #b5cea8);
+  --syn-op: var(--vscode-symbolIcon-operatorForeground, var(--vscode-editor-foreground));
+  --syn-id: var(--vscode-editor-foreground);
+  --guide: var(--vscode-editorIndentGuide-background1, var(--vscode-editorIndentGuide-background, #8884));
+  --fresh: var(--vscode-editor-findMatchHighlightBackground, #ffcc0055);
+  --f-ui: var(--vscode-font-family);
+  --f-code: var(--vscode-editor-font-family);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: var(--vscode-font-size, 13px);
+  padding: 0;
+}
+html, body { height: 100%; }
+.wv { height: 100%; display: flex; flex-direction: column; }
+.tabs { flex: none; }
+.view { flex: 1; min-height: 0; }
+.btn, .chip {
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border-color: transparent;
+}
+.btn:hover:not(:disabled), .chip:hover { background: var(--vscode-button-secondaryHoverBackground); color: var(--vscode-button-secondaryForeground); border-color: transparent; }
+.ns-ghost { background: var(--vscode-editorWidget-background); }
+.ns-edit input { background: var(--vscode-input-background); color: var(--vscode-input-foreground); }
+input[type="range"] { accent-color: var(--vscode-button-background); }
+.wv-status {
+  flex: none; display: block; width: 100%; text-align: left; cursor: pointer;
+  padding: 6px 12px; border: 0; border-top: 1px solid var(--line);
+  background: var(--sunken); color: var(--ink); font: inherit; font-size: 12.5px;
+}
+.wv-status.ok b { color: var(--ok); }
+.wv-status.bad b { color: var(--err); }
+.wv-status .math { font-family: var(--f-code); color: var(--muted); }
