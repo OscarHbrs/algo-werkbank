@@ -74,8 +74,19 @@
       </div>
 
       <div class="view" id="view-ns" role="tabpanel" aria-labelledby="tab-ns" hidden>
-        <p class="lead">Nassi-Shneiderman-Diagramm des aktuellen Programms. Ein Klick auf einen Block markiert die Zeile im Programm.</p>
-        <div class="ns-scroll"><div id="ns"></div></div>
+        <div class="ns-tools">
+          <div class="palette" id="palette" aria-label="Bausteine"></div>
+          <div class="ns-actions">
+            <button class="btn" id="ns-edit" title="Bearbeiten (Doppelklick, Enter)">Bearbeiten</button>
+            <button class="btn" id="ns-up" title="Nach oben (Alt+↑)">↑</button>
+            <button class="btn" id="ns-down" title="Nach unten (Alt+↓)">↓</button>
+            <button class="btn" id="ns-else" hidden>SONST hinzufügen</button>
+            <button class="btn" id="ns-del" title="Löschen (Entf)">Löschen</button>
+            <button class="btn" id="ns-undo" title="Rückgängig (Strg+Z)">Rückgängig</button>
+          </div>
+        </div>
+        <p class="lead">Bausteine ins Struktogramm ziehen oder anklicken: Sie landen hinter dem ausgewählten Block. Doppelklick bearbeitet, am Griff ⠿ verschiebst du Blöcke. Der Code links wird automatisch mitgeschrieben.</p>
+        <div class="ns-scroll"><div id="ns" tabindex="0" aria-label="Struktogramm"></div></div>
       </div>
 
       <div class="view" id="view-deriv" role="tabpanel" aria-labelledby="tab-deriv" hidden>

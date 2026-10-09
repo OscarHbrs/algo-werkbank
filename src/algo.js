@@ -724,3 +724,76 @@ export const GRAMMAR = [
   ['Rechenoperator', '+ | - | * | /'],
   ['Vergleichsoperator', '< | > | = | ≠ | <= | >='],
 ];
+
+// ---------------------------------------------------------------------------
+// Programm wieder als Text ausgeben (für den Struktogramm-Editor).
+// Setzt dabei line/elseLine/endLine neu, damit die Zeilen zum Text passen.
+// ---------------------------------------------------------------------------
+
+const valText = (v) => v.kind === 'var' ? v.name : v.text;
+export const condText = (c) => `${valText(c.left)} ${c.op} ${valText(c.right)}`;
+const exprText = (e) => e.op ? `${valText(e.left)} ${e.op} ${valText(e.right)}` : valText(e.left);
+
+export function stmtText(s) {
+  switch (s.kind) {
+    case 'decl': return `DEKLARIERE ${s.names.map((n) => n.name).join(', ')}`;
+    case 'assign': return `SETZE ${s.target.name} AUF ${exprText(s.expr)}`;
+    case 'read': return `LIES ${s.target.name} EIN`;
+    case 'write': return `GIB ${valText(s.value)} AUS`;
+    case 'if': return `WENN ${condText(s.cond)}:`;
+    case 'while': return `SOLANGE ${condText(s.cond)}:`;
+  }
+}
+
+export function format(program) {
+  const out = [];
+  const block = (b, d) => b.stmts.forEach((s) => stmt(s, d));
+  function stmt(s, d) {
+    const ind = '  '.repeat(d);
+    s.line = out.length + 1;
+    out.push(ind + stmtText(s));
+    if (s.kind === 'if') {
+      block(s.then, d + 1);
+      if (s.else) {
+        s.elseLine = out.length + 1;
+        out.push(ind + 'SONST:');
+        block(s.else, d + 1);
+      }
+      s.endLine = out.length + 1;
+      out.push(ind + 'ENDE WENN');
+    } else if (s.kind === 'while') {
+      block(s.body, d + 1);
+      s.endLine = out.length + 1;
+      out.push(ind + 'ENDE SOLANGE');
+    }
+  }
+  block(program.body, 0);
+  return out.length ? out.join('\n') + '\n' : '';
+}
+
+// Eine einzelne Anweisung (DEKLARIERE, SETZE, LIES, GIB) aus einer Textzeile.
+export function parseStatementText(text) {
+  const line = text.trim();
+  const src = line + '\n';
+  checkAlphabet(src);
+  const word = line.match(/^[A-Za-z]*/)[0].toUpperCase();
+  if (['WENN', 'SOLANGE', 'SONST', 'ENDE'].includes(word)) {
+    throw new AlgoError('syntax', 'Verzweigungen und Schleifen fügst du über die Bausteine WENN und SOLANGE ein.', 1, 1, word.length);
+  }
+  const p = new Parser(src);
+  const s = p.parseStatement(0);
+  if (!p.eof()) p.fail('Hier steht genau eine Anweisung in einer Zeile.');
+  return s;
+}
+
+// Eine Bedingung wie „a > b“. Ein vorangestelltes WENN/SOLANGE oder ein „:“ am Ende wird ignoriert.
+export function parseConditionText(text) {
+  const cond = text.trim().replace(/^(WENN|SOLANGE) /, '').replace(/:$/, '');
+  const src = cond + ':\n';
+  checkAlphabet(src);
+  const p = new Parser(src);
+  const c = p.parseBedingung();
+  p.expectColon();
+  if (!p.eof()) p.fail('Eine Bedingung ist eine einzelne Zeile, z. B. „a > b“.');
+  return c;
+}

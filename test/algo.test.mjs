@@ -159,3 +159,18 @@ ENDE WENN
   const order = derivationOrder(tree);
   assert.equal(sententialForm(tree, order.length).map((p) => p.text).join(''), src);
 });
+
+import { format, parseStatementText, parseConditionText } from '../src/algo.js';
+test('format gibt Programme unverändert wieder aus', () => {
+  for (const ex of EXAMPLES) assert.equal(format(check(ex.code).program), ex.code, ex.id);
+});
+test('einzelne Zeilen für den Struktogramm-Editor', () => {
+  assert.equal(parseStatementText('  SETZE a AUF a - b ').kind, 'assign');
+  assert.deepEqual(parseStatementText('DEKLARIERE a, b').names.map((n) => n.name), ['a', 'b']);
+  assert.throws(() => parseStatementText('WENN a > b:'), /Bausteine/);
+  assert.throws(() => parseStatementText('SETZE a AUF a +'), AlgoErrorLike);
+  assert.equal(parseConditionText('a >= 0').op, '>=');
+  assert.equal(parseConditionText('WENN a ≠ b:').op, '≠');
+  assert.throws(() => parseConditionText('a + 1 > b'));
+});
+function AlgoErrorLike(e) { return e.kind === 'syntax'; }

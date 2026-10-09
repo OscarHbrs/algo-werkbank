@@ -7,7 +7,8 @@ Eine Web-Umgebung für **Algo**, die kleine Algorithmen-Sprache aus *Programmier
 - **Syntaxprüfer** live beim Tippen: gültig (`w ∈ L(Algo)`) oder ungültig, mit Zeile, Spalte und einer Erklärung, was genau falsch ist (Alphabet, Syntax, Einrückung, Semantik).
 - **Ausführen** mit Eingaben für `LIES` (vorab eintragen oder interaktiv) und Ausgaben von `GIB`.
 - **Einzelschritt** (F10) mit markierter Zeile und Speicheransicht.
-- **Struktogramm** (Nassi-Shneiderman) des Programms.
+- **Struktogramm-Editor** (Nassi-Shneiderman): Programme auch komplett ohne Text bauen. Bausteine (DEKLARIERE, SETZE, LIES, GIB, WENN, WENN…SONST, SOLANGE) hineinziehen oder anklicken, per Doppelklick bearbeiten, am Griff ⠿ verschieben (auch in und aus Schleifen/Verzweigungen), löschen, rückgängig machen. Der Code wird automatisch mitgeschrieben.
+  Tastatur: ↑/↓ auswählen, Enter bearbeiten, Alt+↑/↓ verschieben, Entf löschen, Strg+Z rückgängig.
 - **Ableitung**: Linksableitung vom Startsymbol `<Anweisung>` bis zum Programm. Für den ggT sind es wie auf den Folien 71 Schritte.
 - **Syntaxbaum** und **Grammatik** (EBNF der Syntaxdiagramme).
 - Editor mit Hervorhebung, automatischer Einrückung (2 Leerzeichen) und `!=` → `≠`.
@@ -63,5 +64,6 @@ npm test
 
 - `src/algo.js` – Sprachkern: Alphabet- und Syntaxprüfung (rekursiver Abstieg inkl. Einrückung), Semantikprüfung, Interpreter als Generator, Ableitungsbaum
 - `src/app.js` – Oberfläche
+- `src/structogram.js` – Struktogramm-Editor
 - `src/examples.js` – Beispielprogramme
 - `test/` – Tests mit `node:test`

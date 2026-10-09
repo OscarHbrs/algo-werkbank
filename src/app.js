@@ -2,6 +2,7 @@ import {
   check, execute, parseInteger, derivationTree, derivationOrder, sententialForm, productionAt, GRAMMAR,
 } from './algo.js';
 import { EXAMPLES } from './examples.js';
+import { createStructogramEditor } from './structogram.js';
 
 const $ = (sel) => document.querySelector(sel);
 const ta = $('#src');
@@ -156,6 +157,7 @@ statusEl.addEventListener('click', (ev) => {
 
 function recheck() {
   result = check(ta.value);
+  ns.sync(result.program, textFromNS);
   renderStatus();
   renderEditor();
   dirty.ns = dirty.deriv = dirty.tree = true;
@@ -164,6 +166,7 @@ function recheck() {
 
 let checkTimer = null;
 function onChange() {
+  textFromNS = false;
   store.set('code', ta.value);
   if (session) stopSession('Programm geändert, Ausführung beendet.');
   runtimeError = null;
@@ -472,41 +475,34 @@ inputsEl.addEventListener('input', () => store.set('inputs', inputsEl.value));
 // Struktogramm
 // ---------------------------------------------------------------------------
 
-const valText = (v) => v.kind === 'var' ? v.name : v.text;
-const condText = (c) => `${valText(c.left)} ${c.op} ${valText(c.right)}`;
+let textFromNS = false; // aktueller Text wurde im Struktogramm erzeugt (nicht getippt)
 
-function nsBlock(block, lines) {
-  return `<div class="ns-seq">${block.stmts.map((s) => nsStmt(s, lines)).join('')}</div>`;
+function applySource(text) {
+  ta.value = text;
+  textFromNS = true;
+  store.set('code', text);
+  if (session) stopSession('Programm geändert, Ausführung beendet.');
+  runtimeError = null;
+  currentLine = null;
+  clearTimeout(checkTimer);
+  recheck();
 }
-function nsStmt(s, lines) {
-  switch (s.kind) {
-    case 'if':
-      return `<div class="ns-if">
-        <div class="ns-if-head" data-line="${s.line}">
-          <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="0" x2="50" y2="100"/><line x1="100" y1="0" x2="50" y2="100"/></svg>
-          <div class="ns-if-cond">${esc(condText(s.cond))}</div>
-          <div class="ns-if-tf"><span>wahr</span><span>falsch</span></div>
-        </div>
-        <div class="ns-if-body">${nsBlock(s.then, lines)}${s.else ? nsBlock(s.else, lines) : '<div class="ns-empty">∅</div>'}</div>
-      </div>`;
-    case 'while':
-      return `<div class="ns-while"><div class="ns-head" data-line="${s.line}">solange ${esc(condText(s.cond))}</div>${nsBlock(s.body, lines)}</div>`;
-    default:
-      return `<div class="ns-stmt" data-line="${s.line}">${esc(lines[s.line - 1].trim())}</div>`;
-  }
-}
+
+const ns = createStructogramEditor({
+  container: $('#ns'),
+  palette: $('#palette'),
+  scroller: $('#view-ns'),
+  buttons: {
+    edit: $('#ns-edit'), up: $('#ns-up'), down: $('#ns-down'), del: $('#ns-del'),
+    undo: $('#ns-undo'), toggleElse: $('#ns-else'),
+  },
+  onSource: applySource,
+});
 
 function renderNS() {
-  const el = $('#ns');
-  if (!result.ok) { el.innerHTML = invalidNote(); return; }
-  const lines = result.program.source.split('\n');
-  el.innerHTML = `<div class="ns-block">${nsBlock(result.program.body, lines)}</div>`;
+  ns.render();
   if (currentLine != null) setCurrentLine(currentLine);
 }
-$('#ns').addEventListener('click', (e) => {
-  const t = e.target.closest('[data-line]');
-  if (t) jumpTo(+t.dataset.line, 1, 0);
-});
 
 function invalidNote() {
   return '<p class="lead">Das Programm ist gerade nicht gültig. Sobald die Statuszeile „gültig“ zeigt, erscheint hier die Ansicht.</p>';
