@@ -12,6 +12,7 @@ const ALPHABET = new Set([
   '+', '-', '*', '/', '<', '=', '>', '≠', ',', ':', ' ', '\n',
 ]);
 const RECHENOPERATOREN = ['+', '-', '*', '/'];
+// Erste Zeichen der Vergleichsoperatoren. <= und >= sind eine Erweiterung gegenüber der Vorlesung.
 const VERGLEICHSOPERATOREN = ['<', '>', '=', '≠'];
 const isLower = (c) => c >= 'a' && c <= 'z';
 const isDigit = (c) => c >= '0' && c <= '9';
@@ -52,7 +53,7 @@ function alphabetHint(c) {
   if ('äöüßÄÖÜ'.includes(c)) return 'Umlaute und ß gehören nicht zum Alphabet. Schreibe z. B. „ae“ statt „ä“.';
   if (c === '"' || c === "'") return 'Zeichenketten gibt es in Algo nicht. Alle Werte sind Ganzzahlen.';
   if (c === '#') return 'Kommentare gibt es in Algo nicht.';
-  if (c === '≤' || c === '≥') return 'Als Vergleichsoperatoren gibt es nur <, >, = und ≠.';
+  if (c === '≤' || c === '≥') return `Schreibe stattdessen „${c === '≤' ? '<=' : '>='}“.`;
   if (c === '%') return 'Einen Modulo-Operator gibt es nicht. Rest von a durch b: erst a / b, dann mal b, dann von a abziehen.';
   if (c === '.') return 'Kommazahlen gibt es nicht. Alle Werte sind Ganzzahlen.';
   if (isUpper(c)) return `Großbuchstaben gibt es nur so weit, wie die Schlüsselwörter sie brauchen. „${c}“ kommt in keinem Schlüsselwort vor.`;
@@ -427,16 +428,18 @@ class Parser {
       this.fail(`Leerzeichen und Vergleichsoperator erwartet, gefunden: ${this.found()}.`, this.pos, this.tokenLength());
     }
     this.pos++;
-    const op = this.s[this.pos];
+    let op = this.s[this.pos];
     if (!VERGLEICHSOPERATOREN.includes(op ?? '')) {
       if (RECHENOPERATOREN.includes(op ?? '')) {
-        this.fail(`Vergleichsoperator erwartet (<, >, =, ≠), gefunden: „${op}“. In Bedingungen wird nicht gerechnet – vorher mit SETZE ausrechnen.`);
+        this.fail(`Vergleichsoperator erwartet (<, >, <=, >=, =, ≠), gefunden: „${op}“. In Bedingungen wird nicht gerechnet – vorher mit SETZE ausrechnen.`);
       }
-      this.fail(`Vergleichsoperator erwartet (<, >, = oder ≠), gefunden: ${this.found()}.`, this.pos, this.tokenLength());
+      this.fail(`Vergleichsoperator erwartet (<, >, <=, >=, = oder ≠), gefunden: ${this.found()}.`, this.pos, this.tokenLength());
     }
     this.pos++;
-    if ((op === '<' || op === '>') && this.at('=')) this.fail('„<=“ und „>=“ gibt es nicht. Erlaubt sind nur <, >, = und ≠.', this.pos - 1, 2);
+    if ((op === '<' || op === '>') && this.at('=')) { op += '='; this.pos++; }
     if (op === '=' && this.at('=')) this.fail('Gleichheit wird mit einem einzelnen „=“ geprüft.', this.pos - 1, 2);
+    if (op === '=' && (this.at('<') || this.at('>'))) this.fail(`„=${this.s[this.pos]}“ gibt es nicht. Meintest du „${this.s[this.pos]}=“?`, this.pos - 1, 2);
+    if (op === '<' && this.at('>')) this.fail('Für „ungleich“ gibt es das Zeichen ≠.', this.pos - 1, 2);
     if (!this.at(' ')) this.fail(`Nach dem Vergleichsoperator „${op}“ folgt genau ein Leerzeichen.`);
     this.pos++;
     const right = this.parseWert();
@@ -530,6 +533,8 @@ export function* execute(program) {
       case '>': return a > b;
       case '=': return a === b;
       case '≠': return a !== b;
+      case '<=': return a <= b;
+      case '>=': return a >= b;
     }
   };
   const evaluate = (e) => {
@@ -717,5 +722,5 @@ export const GRAMMAR = [
   ['Ganzzahl', '0 | [ - ] ( 1 | … | 9 ) { <Ziffer> }'],
   ['Ziffer', '0 | … | 9'],
   ['Rechenoperator', '+ | - | * | /'],
-  ['Vergleichsoperator', '< | > | = | ≠'],
+  ['Vergleichsoperator', '< | > | = | ≠ | <= | >='],
 ];

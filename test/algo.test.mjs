@@ -77,7 +77,8 @@ test('Syntaxfehler mit Position', () => {
     ['DEKLARIERE a\nSETZE a AUF -0', 2],
     ['DEKLARIERE a\nSETZE a AUF a -1', 2],
     ['DEKLARIERE a\nSETZE a AUF a-1', 2],
-    ['DEKLARIERE a\nWENN a >= 1:\n  GIB a AUS\nENDE WENN', 2],
+    ['DEKLARIERE a\nWENN a => 1:\n  GIB a AUS\nENDE WENN', 2],
+    ['DEKLARIERE a\nWENN a >=1:\n  GIB a AUS\nENDE WENN', 2],
     ['DEKLARIERE a\nWENN a > 1\n  GIB a AUS\nENDE WENN', 2],
     ['DEKLARIERE a\nWENN a > 1 :\n  GIB a AUS\nENDE WENN', 2],
     ['DEKLARIERE a\nWENN a > 1:\nGIB a AUS\nENDE WENN', 3],
@@ -134,4 +135,27 @@ test('alle Beispiele sind gültig und laufen', () => {
     if (expected[ex.id]) assert.deepEqual(out, expected[ex.id], ex.id);
     assert.ok(out.length > 0, ex.id);
   }
+});
+
+test('<= und >= (Erweiterung)', () => {
+  const src = `DEKLARIERE a, b
+LIES a EIN
+LIES b EIN
+WENN a >= b:
+  GIB 1 AUS
+SONST:
+  GIB 0 AUS
+ENDE WENN
+WENN a <= b:
+  GIB 1 AUS
+SONST:
+  GIB 0 AUS
+ENDE WENN
+`;
+  assert.deepEqual(run(src, [5, 5]), [1n, 1n]);
+  assert.deepEqual(run(src, [6, 5]), [1n, 0n]);
+  assert.deepEqual(run(src, [4, 5]), [0n, 1n]);
+  const tree = derivationTree(check(src).program);
+  const order = derivationOrder(tree);
+  assert.equal(sententialForm(tree, order.length).map((p) => p.text).join(''), src);
 });
